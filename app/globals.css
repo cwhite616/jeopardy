@@ -95,3 +95,12 @@ body {
     perspective: 500px;
   }
 }
+
+
+.reset-button {
+  opacity: 50%;
+}
+
+.reset-button:hover {
+  opacity: 100%;
+}

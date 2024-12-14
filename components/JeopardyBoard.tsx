@@ -22,6 +22,11 @@ interface Category {
   questions: Question[]
 }
 
+interface ActiveCell {
+  categoryIndex: number
+  questionIndex: number
+}
+
 export default function JeopardyBoard() {
   const [board, setBoard] = useState<Category[]>(
     initialCategories.map(category => ({
@@ -35,6 +40,7 @@ export default function JeopardyBoard() {
       })),
     }))
   )
+  const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
 
   const resetBoard = () => {
     setBoard(
@@ -49,9 +55,14 @@ export default function JeopardyBoard() {
         })),
       }))
     )
+    setActiveCell(null)
   }
 
   const revealCell = (categoryIndex: number, questionIndex: number) => {
+    if (activeCell && (activeCell.categoryIndex !== categoryIndex || activeCell.questionIndex !== questionIndex)) {
+      return
+    }
+
     setBoard(prevBoard => {
       const newBoard = JSON.parse(JSON.stringify(prevBoard))
       const cell = newBoard[categoryIndex].questions[questionIndex]
@@ -64,14 +75,26 @@ export default function JeopardyBoard() {
         } else {
           cell.showQuestion = false
         }
+        setActiveCell({ categoryIndex, questionIndex })
       } else if (cell.isDailyDouble && cell.showDailyDouble) {
         cell.showDailyDouble = false
         cell.showQuestion = false
       } else if (!cell.showQuestion) {
         cell.showQuestion = true
+        setActiveCell(null)
       }
       return newBoard
     })
+  }
+
+  const resetQuestion = (categoryIndex: number, questionIndex: number) => {
+    setBoard(prevBoard => {
+      const newBoard = JSON.parse(JSON.stringify(prevBoard))
+      const cell = newBoard[categoryIndex].questions[questionIndex]
+      cell.showQuestion = false
+      return newBoard
+    })
+    setActiveCell({ categoryIndex, questionIndex })
   }
 
   const importCSV = async (file: File) => {
@@ -120,6 +143,12 @@ export default function JeopardyBoard() {
                 key={item.value}
                 item={item}
                 onClick={() => revealCell(categoryIndex, questionIndex)}
+                onReset={() => resetQuestion(categoryIndex, questionIndex)}
+                isActive={
+                  activeCell?.categoryIndex === categoryIndex && 
+                  activeCell?.questionIndex === questionIndex
+                }
+                activeCell={activeCell}
               />
             ))}
           </div>

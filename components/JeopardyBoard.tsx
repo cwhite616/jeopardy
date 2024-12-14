@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import HamburgerMenu from './HamburgerMenu'
+import JeopardyCell from './JeopardyCell'
 
 const initialCategories = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5']
 const initialValues = [100, 200, 300, 400, 500]
@@ -116,48 +116,11 @@ export default function JeopardyBoard() {
               {category.name}
             </div>
             {category.questions.map((item, questionIndex) => (
-              <motion.div
+              <JeopardyCell
                 key={item.value}
-                className="h-[calc((100vh-6rem)/6)] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded cursor-pointer perspective-500"
-                whileHover={{ scale: 1.02 }}
+                item={item}
                 onClick={() => revealCell(categoryIndex, questionIndex)}
-              >
-                <div className="relative w-full h-full">
-                  <motion.div
-                    className="absolute inset-0 preserve-3d"
-                    initial={false}
-                    animate={{
-                      rotateX: item.revealed ? 180 : 0,
-                    }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    {/* Front face */}
-                    <div 
-                      className="absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden"
-                    >
-                      ${item.value}
-                    </div>
-                    {/* Back face */}
-                    <div 
-                      className={`absolute w-full h-full flex items-center justify-center backface-hidden rotate-x-180 ${
-                        item.showQuestion ? 'bg-blue-600/70' : 'bg-blue-700'
-                      }`}
-                    >
-                      <div className="text-center text-lg p-2">
-                        {item.revealed && (
-                          item.showDailyDouble ? (
-                            <span className="text-3xl font-bold">DAILY DOUBLE!</span>
-                          ) : item.showQuestion ? (
-                            item.question
-                          ) : (
-                            item.answer
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
+              />
             ))}
           </div>
         ))}

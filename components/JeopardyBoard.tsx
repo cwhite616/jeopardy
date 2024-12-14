@@ -7,8 +7,21 @@ import HamburgerMenu from './HamburgerMenu'
 const initialCategories = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5']
 const initialValues = [100, 200, 300, 400, 500]
 
+interface Question {
+  value: number
+  answer: string
+  question: string
+  revealed: boolean
+  showQuestion?: boolean
+}
+
+interface Category {
+  name: string
+  questions: Question[]
+}
+
 export default function JeopardyBoard() {
-  const [board, setBoard] = useState(
+  const [board, setBoard] = useState<Category[]>(
     initialCategories.map(category => ({
       name: category,
       questions: initialValues.map(value => ({
@@ -60,15 +73,25 @@ export default function JeopardyBoard() {
         body: formData,
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error('Failed to import CSV')
+        throw new Error(data.error || 'Failed to import CSV')
       }
 
-      const { board: newBoard } = await response.json()
-      setBoard(newBoard)
+      const processedBoard = data.board.map((category: Category) => ({
+        ...category,
+        questions: category.questions.map((question: Question) => ({
+          ...question,
+          showQuestion: false,
+        })),
+      }))
+
+      setBoard(processedBoard)
     } catch (error) {
       console.error('Error importing CSV:', error)
-      // Handle error (e.g., show an error message to the user)
+      // You might want to add some UI feedback here
+      alert(error instanceof Error ? error.message : 'Failed to import CSV')
     }
   }
 

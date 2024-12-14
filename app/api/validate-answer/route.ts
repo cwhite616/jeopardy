@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "system",
-            content: "You are judging answers in a Jeopardy game. When comparing the player's response to the correct answer, ignore phrases like 'What is', 'Who is', 'Where is', etc. Focus only on the core concept being answered. The answer must convey the same meaning but does not need to use identical wording. Be strict about the core concept being correct."
+            content: "You are judging answers in a Jeopardy game. When comparing the player's response to the correct answer, ignore phrases like 'What is', 'Who is', 'Where is', etc. Focus only on the core concept being answered. The answer must convey the same meaning but does not need to use identical wording. Be strict about the core concept being correct. Don't stress about spelling, punctuation, or other minor details."
           },
           {
             role: "user",

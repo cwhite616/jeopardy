@@ -9,6 +9,15 @@ interface CSVRecord {
   answer: string
 }
 
+// Add this interface near the top of the file
+interface Question {
+  value: number
+  answer: string
+  question: string
+  revealed: boolean
+  isDailyDouble?: boolean
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -85,7 +94,8 @@ export async function POST(req: NextRequest) {
           answer: record.answer,
           question: record.question,
           revealed: false,
-        })),
+          isDailyDouble: false,
+        } as Question)),
     }))
 
     // Randomly select one question to be the daily double

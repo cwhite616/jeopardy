@@ -31,6 +31,9 @@ interface ActiveCell {
 }
 
 export default function JeopardyBoard() {
+  const isTestMode = typeof window !== 'undefined' && 
+    new URLSearchParams(window.location.search).get('test') === 'true'
+
   const [board, setBoard] = useState<Category[]>(
     initialCategories.map(category => ({
       name: category,
@@ -170,6 +173,7 @@ export default function JeopardyBoard() {
                   activeCell?.questionIndex === questionIndex
                 }
                 activeCell={activeCell}
+                isTestMode={isTestMode}
               />
             ))}
           </div>

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { RotateCw } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface Question {
   value: number
@@ -28,15 +28,27 @@ interface JeopardyCellProps {
   onReset?: () => void
   isActive?: boolean
   activeCell: ActiveCell | null
+  isTestMode?: boolean
 }
 
-export default function JeopardyCell({ item, onClick, onReset, isActive, activeCell }: JeopardyCellProps) {
+export default function JeopardyCell({ item, onClick, onReset, isActive, activeCell, isTestMode }: JeopardyCellProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showCorrect, setShowCorrect] = useState(false)
   const [isIncorrect, setIsIncorrect] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [incorrectAttempts, setIncorrectAttempts] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [showDailyDoubleAnimation, setShowDailyDoubleAnimation] = useState(true)
+
+  useEffect(() => {
+    if (item.showDailyDouble) {
+      setShowDailyDoubleAnimation(true)
+      const timer = setTimeout(() => {
+        setShowDailyDoubleAnimation(false)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [item.showDailyDouble])
 
   const handleResetClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -125,7 +137,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
             <div 
               className={`absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden ${
                 item.wasRevealed ? 'italic' : ''
-              }`}
+              } ${isTestMode && item.isDailyDouble ? 'ring-2 ring-cyan-400' : ''}`}
             >
               ${item.value}
             </div>
@@ -177,6 +189,11 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
             >
+              {item.isDailyDouble && (
+                <div className="absolute top-4 left-0 w-full text-center font-bold">
+                  DAILY DOUBLE!
+                </div>
+              )}
               <button
                 onClick={handleResetClick}
                 aria-label="Reset value"
@@ -188,46 +205,62 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                 <div className="text-center text-3xl md:text-4xl p-8 flex-grow flex items-center justify-center">
                   {showCorrect ? (
                     <div className="text-green-400 font-bold">Correct!</div>
+                  ) : item.isDailyDouble && showDailyDoubleAnimation ? (
+                    <motion.div
+                      className="text-4xl md:text-5xl font-bold"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [1, 0.8, 1]
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: 1
+                      }}
+                    >
+                      DAILY DOUBLE!
+                    </motion.div>
                   ) : (
                     item.answer
                   )}
                 </div>
-                <div className="w-full p-8">
-                  <form onSubmit={handleSubmit} className="flex gap-2">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      className="flex-grow px-4 py-2 rounded bg-white text-blue-900 text-xl placeholder:text-blue-900/50"
-                      placeholder="Enter your question..."
-                      disabled={isSubmitting || showCorrect}
-                    />
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || showCorrect}
-                      className="px-6 py-2 bg-blue-800 rounded hover:bg-blue-900 transition-colors disabled:opacity-50"
-                    >
-                      Submit
-                    </button>
-                  </form>
-                  {error ? (
-                    <div className="text-red-400 text-xl mt-2">
-                      {error}
-                    </div>
-                  ) : isIncorrect && (
-                    <motion.div
-                      key={incorrectAttempts}
-                      initial={{ color: '#FF0000', opacity: 1 }}
-                      animate={{ color: '#EF4444', opacity: 0 }}
-                      transition={{ 
-                        color: { duration: 3 },
-                        opacity: { duration: 8 }
-                      }}
-                      className="text-xl mt-2"
-                    >
-                      Incorrect. Try again!
-                    </motion.div>
-                  )}
-                </div>
+                {(!item.isDailyDouble || !showDailyDoubleAnimation) && (
+                  <div className="w-full p-8">
+                    <form onSubmit={handleSubmit} className="flex gap-2">
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        className="flex-grow px-4 py-2 rounded bg-white text-blue-900 text-xl placeholder:text-blue-900/50"
+                        placeholder="Enter your question..."
+                        disabled={isSubmitting || showCorrect}
+                      />
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || showCorrect}
+                        className="px-6 py-2 bg-blue-800 rounded hover:bg-blue-900 transition-colors disabled:opacity-50"
+                      >
+                        Submit
+                      </button>
+                    </form>
+                    {error ? (
+                      <div className="text-red-400 text-xl mt-2">
+                        {error}
+                      </div>
+                    ) : isIncorrect && (
+                      <motion.div
+                        key={incorrectAttempts}
+                        initial={{ color: '#FF0000', opacity: 1 }}
+                        animate={{ color: '#EF4444', opacity: 0 }}
+                        transition={{ 
+                          color: { duration: 3 },
+                          opacity: { duration: 8 }
+                        }}
+                        className="text-xl mt-2"
+                      >
+                        Incorrect. Try again!
+                      </motion.div>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

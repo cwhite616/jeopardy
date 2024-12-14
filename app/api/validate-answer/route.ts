@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
 
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
-            content: "You are judging answers in a Jeopardy game. You should determine if the player's response is close enough to the correct answer to be considered valid. Consider that in Jeopardy, answers must be phrased as questions, but be lenient with exact wording if the core concept is correct."
+            content: "You are judging answers in a Jeopardy game. When comparing the player's response to the correct answer, ignore phrases like 'What is', 'Who is', 'Where is', etc. Focus only on the core concept being answered. The answer must convey the same meaning but does not need to use identical wording. Be strict about the core concept being correct."
           },
           {
             role: "user",

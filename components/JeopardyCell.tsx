@@ -35,6 +35,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
   const [showCorrect, setShowCorrect] = useState(false)
   const [isIncorrect, setIsIncorrect] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [incorrectAttempts, setIncorrectAttempts] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleResetClick = (e: React.MouseEvent) => {
@@ -74,6 +75,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
         }, 2000)
       } else {
         setIsIncorrect(true)
+        setIncorrectAttempts(prev => prev + 1)
         inputRef.current.value = ''
         inputRef.current.focus()
       }
@@ -195,7 +197,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                     <input
                       ref={inputRef}
                       type="text"
-                      className="flex-grow px-4 py-2 rounded bg-blue-800 text-yellow-300 text-xl placeholder:text-yellow-300/50"
+                      className="flex-grow px-4 py-2 rounded bg-white text-blue-900 text-xl placeholder:text-blue-900/50"
                       placeholder="Enter your question..."
                       disabled={isSubmitting || showCorrect}
                     />
@@ -212,9 +214,18 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                       {error}
                     </div>
                   ) : isIncorrect && (
-                    <div className="text-red-400 text-xl mt-2">
+                    <motion.div
+                      key={incorrectAttempts}
+                      initial={{ color: '#FF0000', opacity: 1 }}
+                      animate={{ color: '#EF4444', opacity: 0 }}
+                      transition={{ 
+                        color: { duration: 3 },
+                        opacity: { duration: 8 }
+                      }}
+                      className="text-xl mt-2"
+                    >
                       Incorrect. Try again!
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               </div>

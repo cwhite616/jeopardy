@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import HamburgerMenu from './HamburgerMenu'
 import JeopardyCell from './JeopardyCell'
+import { motion } from 'framer-motion'
 
 const initialCategories = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5']
 const initialValues = [100, 200, 300, 400, 500]
@@ -15,6 +16,7 @@ interface Question {
   showQuestion?: boolean
   isDailyDouble?: boolean
   showDailyDouble?: boolean
+  showModal?: boolean
 }
 
 interface Category {
@@ -81,6 +83,10 @@ export default function JeopardyBoard() {
         cell.showQuestion = false
       } else if (!cell.showQuestion) {
         cell.showQuestion = true
+        cell.showModal = true
+        setActiveCell(null)
+      } else {
+        cell.showModal = false
         setActiveCell(null)
       }
       return newBoard
@@ -131,8 +137,18 @@ export default function JeopardyBoard() {
 
   return (
     <div className="relative w-full h-full p-2 md:p-4">
-      <HamburgerMenu onReset={resetBoard} onImportCSV={importCSV} />
-      <div className="grid grid-cols-5 gap-1 md:gap-2 h-[calc(100vh-2rem)]">
+      {activeCell && !board[activeCell.categoryIndex].questions[activeCell.questionIndex].showQuestion && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 pointer-events-none z-30"
+        />
+      )}
+      <div className="relative z-[60]">
+        <HamburgerMenu onReset={resetBoard} onImportCSV={importCSV} />
+      </div>
+      <div className="grid grid-cols-5 gap-1 md:gap-2 h-[calc(100vh-2rem)] relative z-40">
         {board.map((category, categoryIndex) => (
           <div key={category.name} className="space-y-1 md:space-y-2">
             <div className="h-[calc((100vh-6rem)/6)] flex items-center justify-center bg-blue-900 text-yellow-300 text-xl md:text-2xl font-serif p-2 rounded">

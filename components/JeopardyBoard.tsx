@@ -17,6 +17,7 @@ interface Question {
   isDailyDouble?: boolean
   showDailyDouble?: boolean
   showModal?: boolean
+  wasRevealed?: boolean
 }
 
 interface Category {
@@ -97,10 +98,14 @@ export default function JeopardyBoard() {
     setBoard(prevBoard => {
       const newBoard = JSON.parse(JSON.stringify(prevBoard))
       const cell = newBoard[categoryIndex].questions[questionIndex]
+      cell.revealed = false
       cell.showQuestion = false
+      cell.showModal = false
+      cell.showDailyDouble = false
+      cell.wasRevealed = true
       return newBoard
     })
-    setActiveCell({ categoryIndex, questionIndex })
+    setActiveCell(null)
   }
 
   const importCSV = async (file: File) => {

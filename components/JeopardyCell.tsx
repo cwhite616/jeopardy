@@ -14,6 +14,7 @@ interface Question {
   isDailyDouble?: boolean
   showDailyDouble?: boolean
   showModal?: boolean
+  wasRevealed?: boolean
 }
 
 interface ActiveCell {
@@ -71,7 +72,9 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
           >
             {/* Front face */}
             <div 
-              className="absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden"
+              className={`absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden ${
+                item.wasRevealed ? 'italic' : ''
+              }`}
             >
               ${item.value}
             </div>
@@ -91,7 +94,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                         {item.showQuestion && (!activeCell || isActive) && (
                           <button
                             onClick={handleResetClick}
-                            aria-label="Reset question"
+                            aria-label="Reset value"
                             className="absolute top-2 right-2 p-1 hover:bg-blue-800 rounded-full transition-colors reset-button"
                           >
                             <RotateCw className="w-5 h-5" />

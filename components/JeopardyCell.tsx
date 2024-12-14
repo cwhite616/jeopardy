@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { RotateCw } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
-import QuestionModal from './QuestionModal'
+import { useState, useRef } from 'react'
 
 interface Question {
   value: number
@@ -31,9 +31,58 @@ interface JeopardyCellProps {
 }
 
 export default function JeopardyCell({ item, onClick, onReset, isActive, activeCell }: JeopardyCellProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showCorrect, setShowCorrect] = useState(false)
+  const [isIncorrect, setIsIncorrect] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const handleResetClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     onReset?.()
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!inputRef.current?.value) return
+
+    setIsSubmitting(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/validate-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerAnswer: inputRef.current.value,
+          correctQuestion: item.question
+        })
+      })
+
+      const data = await response.json()
+      
+      if (data.error === 'QUOTA_ERROR') {
+        setError('OpenAI API quota exceeded. Please try again later.')
+        return
+      }
+      
+      if (data.isCorrect) {
+        setShowCorrect(true)
+        setIsIncorrect(false)
+        setTimeout(() => {
+          setShowCorrect(false)
+          onClick()
+        }, 2000)
+      } else {
+        setIsIncorrect(true)
+        inputRef.current.value = ''
+        inputRef.current.focus()
+      }
+    } catch (error) {
+      console.error('Error validating answer:', error)
+      setError('Failed to validate answer. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -121,32 +170,56 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="w-[80vw] h-[60vh] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded cursor-pointer"
+              className="w-[80vw] h-[60vh] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded relative"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              onClick={onClick}
             >
-              <div className="relative w-full h-full">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-3xl md:text-4xl p-8">
-                    {item.answer}
-                  </div>
+              <button
+                onClick={handleResetClick}
+                aria-label="Reset value"
+                className="absolute top-4 right-4 p-1 hover:bg-blue-800 rounded-full transition-colors z-10"
+              >
+                <RotateCw className="w-5 h-5" />
+              </button>
+              <div className="relative w-full h-full flex flex-col items-center justify-center">
+                <div className="text-center text-3xl md:text-4xl p-8 flex-grow flex items-center justify-center">
+                  {showCorrect ? (
+                    <div className="text-green-400 font-bold">Correct!</div>
+                  ) : (
+                    item.answer
+                  )}
+                </div>
+                <div className="w-full p-8">
+                  <form onSubmit={handleSubmit} className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      className="flex-grow px-4 py-2 rounded bg-blue-800 text-yellow-300 text-xl placeholder:text-yellow-300/50"
+                      placeholder="Enter your question..."
+                      disabled={isSubmitting || showCorrect}
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || showCorrect}
+                      className="px-6 py-2 bg-blue-800 rounded hover:bg-blue-900 transition-colors disabled:opacity-50"
+                    >
+                      Submit
+                    </button>
+                  </form>
+                  {error ? (
+                    <div className="text-red-400 text-xl mt-2">
+                      {error}
+                    </div>
+                  ) : isIncorrect && (
+                    <div className="text-red-400 text-xl mt-2">
+                      Incorrect. Try again!
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Question modal */}
-      <AnimatePresence>
-        {item.revealed && item.showQuestion && item.showModal && (
-          <QuestionModal
-            question={item.question}
-            onClose={onClick}
-            onReset={handleResetClick}
-          />
         )}
       </AnimatePresence>
     </>

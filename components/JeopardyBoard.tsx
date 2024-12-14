@@ -13,6 +13,8 @@ interface Question {
   question: string
   revealed: boolean
   showQuestion?: boolean
+  isDailyDouble?: boolean
+  showDailyDouble?: boolean
 }
 
 interface Category {
@@ -53,8 +55,17 @@ export default function JeopardyBoard() {
     setBoard(prevBoard => {
       const newBoard = JSON.parse(JSON.stringify(prevBoard))
       const cell = newBoard[categoryIndex].questions[questionIndex]
+      
       if (!cell.revealed) {
         cell.revealed = true
+        if (cell.isDailyDouble) {
+          cell.showDailyDouble = true
+          cell.showQuestion = false
+        } else {
+          cell.showQuestion = false
+        }
+      } else if (cell.isDailyDouble && cell.showDailyDouble) {
+        cell.showDailyDouble = false
         cell.showQuestion = false
       } else if (!cell.showQuestion) {
         cell.showQuestion = true
@@ -113,33 +124,35 @@ export default function JeopardyBoard() {
               >
                 <div className="relative w-full h-full">
                   <motion.div
-                    className="absolute inset-0"
+                    className="absolute inset-0 preserve-3d"
                     initial={false}
                     animate={{
                       rotateX: item.revealed ? 180 : 0,
                     }}
-                    style={{ transformStyle: 'preserve-3d' }}
                     transition={{ duration: 0.6 }}
                   >
                     {/* Front face */}
                     <div 
-                      className="absolute w-full h-full flex items-center justify-center bg-blue-700"
-                      style={{ backfaceVisibility: 'hidden' }}
+                      className="absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden"
                     >
                       ${item.value}
                     </div>
                     {/* Back face */}
                     <div 
-                      className={`absolute w-full h-full flex items-center justify-center ${
+                      className={`absolute w-full h-full flex items-center justify-center backface-hidden rotate-x-180 ${
                         item.showQuestion ? 'bg-blue-600/70' : 'bg-blue-700'
                       }`}
-                      style={{ 
-                        backfaceVisibility: 'hidden',
-                        transform: 'rotateX(180deg)'
-                      }}
                     >
                       <div className="text-center text-lg p-2">
-                        {item.revealed && (item.showQuestion ? item.question : item.answer)}
+                        {item.revealed && (
+                          item.showDailyDouble ? (
+                            <span className="text-3xl font-bold">DAILY DOUBLE!</span>
+                          ) : item.showQuestion ? (
+                            item.question
+                          ) : (
+                            item.answer
+                          )
+                        )}
                       </div>
                     </div>
                   </motion.div>

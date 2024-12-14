@@ -9,6 +9,15 @@ interface CSVRecord {
   answer: string
 }
 
+interface Question {
+  value: number
+  answer: string
+  question: string
+  revealed: boolean
+  isDailyDouble?: boolean
+  showDailyDouble?: boolean
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -31,11 +40,6 @@ export async function POST(req: NextRequest) {
     if (parsedRecords.length === 0) {
       return NextResponse.json({ error: 'CSV file is empty' }, { status: 400 })
     }
-
-    // Get the headers from the first record and normalize them
-    const headers = Object.keys(parsedRecords[0]).map(header => 
-      header.toLowerCase().trim().replace(/[^a-z]/g, '')
-    )
 
     // Find the required column names by matching normalized versions
     const categoryColumn = Object.keys(parsedRecords[0]).find(
@@ -92,6 +96,11 @@ export async function POST(req: NextRequest) {
           revealed: false,
         })),
     }))
+
+    // Randomly select one question to be the daily double
+    const randomCategoryIndex = Math.floor(Math.random() * board.length)
+    const randomQuestionIndex = Math.floor(Math.random() * board[randomCategoryIndex].questions.length)
+    board[randomCategoryIndex].questions[randomQuestionIndex].isDailyDouble = true
 
     return NextResponse.json({ board })
   } catch (error) {

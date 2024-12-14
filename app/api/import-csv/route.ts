@@ -9,15 +9,6 @@ interface CSVRecord {
   answer: string
 }
 
-interface Question {
-  value: number
-  answer: string
-  question: string
-  revealed: boolean
-  isDailyDouble?: boolean
-  showDailyDouble?: boolean
-}
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()

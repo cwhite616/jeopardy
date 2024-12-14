@@ -96,19 +96,19 @@ export default function JeopardyBoard() {
   }
 
   return (
-    <div className="relative w-full max-w-6xl p-4">
+    <div className="relative w-full h-full p-2 md:p-4">
       <HamburgerMenu onReset={resetBoard} onImportCSV={importCSV} />
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-1 md:gap-2 h-[calc(100vh-2rem)]">
         {board.map((category, categoryIndex) => (
-          <div key={category.name} className="space-y-4">
-            <div className="h-24 flex items-center justify-center bg-blue-900 text-yellow-300 text-2xl font-serif p-2 rounded">
+          <div key={category.name} className="space-y-1 md:space-y-2">
+            <div className="h-[calc((100vh-6rem)/6)] flex items-center justify-center bg-blue-900 text-yellow-300 text-xl md:text-2xl font-serif p-2 rounded">
               {category.name}
             </div>
             {category.questions.map((item, questionIndex) => (
               <motion.div
                 key={item.value}
-                className="h-24 bg-blue-700 text-yellow-300 text-3xl font-serif rounded cursor-pointer perspective-500"
-                whileHover={{ scale: 1.05 }}
+                className="h-[calc((100vh-6rem)/6)] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded cursor-pointer perspective-500"
+                whileHover={{ scale: 1.02 }}
                 onClick={() => revealCell(categoryIndex, questionIndex)}
               >
                 <div className="relative w-full h-full">

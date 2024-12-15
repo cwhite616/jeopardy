@@ -159,7 +159,7 @@ export default function JeopardyBoard() {
       <div className="grid grid-cols-5 gap-1 md:gap-2 h-[calc(100vh-2rem)] relative z-40">
         {board.map((category, categoryIndex) => (
           <div key={category.name} className="space-y-1 md:space-y-2">
-            <div className="h-[calc((100vh-6rem)/6)] flex items-center justify-center bg-blue-900 text-yellow-300 text-xl md:text-2xl font-serif p-2 rounded">
+            <div className="h-[calc((100vh-6rem)/6)] flex items-center justify-center bg-blue-900 text-yellow-300 text-3xl md:text-4xl lg:text-5xl font-serif p-4 rounded text-center">
               {category.name}
             </div>
             {category.questions.map((item, questionIndex) => (

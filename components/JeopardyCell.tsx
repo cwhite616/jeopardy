@@ -39,14 +39,12 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
   const [incorrectAttempts, setIncorrectAttempts] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const [showDailyDoubleAnimation, setShowDailyDoubleAnimation] = useState(true)
+  const [showWagerPrompt, setShowWagerPrompt] = useState(true)
 
   useEffect(() => {
     if (item.showDailyDouble) {
+      setShowWagerPrompt(true)
       setShowDailyDoubleAnimation(true)
-      const timer = setTimeout(() => {
-        setShowDailyDoubleAnimation(false)
-      }, 2000)
-      return () => clearTimeout(timer)
     }
   }, [item.showDailyDouble])
 
@@ -81,6 +79,10 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
       if (data.isCorrect) {
         setShowCorrect(true)
         setIsIncorrect(false)
+        if (item.isDailyDouble) {
+          setShowDailyDoubleAnimation(false)
+          setShowWagerPrompt(false)
+        }
         setTimeout(() => {
           setShowCorrect(false)
           onClick()
@@ -139,7 +141,9 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                 item.wasRevealed ? 'italic' : ''
               } ${isTestMode && item.isDailyDouble ? 'ring-2 ring-cyan-400' : ''}`}
             >
-              ${item.value}
+              <span className="text-4xl md:text-6xl lg:text-7xl scale-[1]">
+                ${item.value}
+              </span>
             </div>
             {/* Back face */}
             <div 
@@ -217,24 +221,49 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                   {showCorrect ? (
                     <div className="text-green-400 font-bold">Correct!</div>
                   ) : item.isDailyDouble && showDailyDoubleAnimation ? (
-                    <motion.div
-                      className="text-4xl md:text-5xl font-bold"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [1, 0.8, 1]
-                      }}
-                      transition={{
-                        duration: 1,
-                        repeat: 1
-                      }}
-                    >
-                      DAILY DOUBLE!
-                    </motion.div>
+                    <div className="flex flex-col items-center gap-6">
+                      <motion.div
+                        className="text-4xl md:text-5xl font-bold"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [1, 0.8, 1]
+                        }}
+                        transition={{
+                          duration: 1,
+                          repeat: 1
+                        }}
+                      >
+                        DAILY DOUBLE!
+                      </motion.div>
+                      {showWagerPrompt && (
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="text-2xl">Please state your wager now.</div>
+                          <button
+                            onClick={() => {
+                              setShowWagerPrompt(false)
+                              setShowDailyDoubleAnimation(false)
+                              setIsIncorrect(false)
+                              setError(null)
+                              setShowCorrect(false)
+                              if (inputRef.current) {
+                                inputRef.current.value = ''
+                              }
+                              if (item.isDailyDouble) {
+                                item.showDailyDouble = false
+                              }
+                            }}
+                            className="px-6 py-2 bg-blue-800 rounded hover:bg-blue-900 transition-colors"
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     item.answer
                   )}
                 </div>
-                {(!item.isDailyDouble || !showDailyDoubleAnimation) && (
+                {(!showDailyDoubleAnimation) && (
                   <div className="w-full p-8">
                     <form onSubmit={handleSubmit} className="flex gap-2">
                       <input

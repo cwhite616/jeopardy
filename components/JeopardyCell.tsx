@@ -217,7 +217,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                 </button>
               </div>
               <div className="relative w-full h-full flex flex-col items-center justify-center">
-                <div className="text-center text-3xl md:text-4xl p-8 flex-grow flex items-center justify-center">
+                <div className="text-center text-4xl md:text-5xl lg:text-6xl p-8 flex-grow flex items-center justify-center">
                   {showCorrect ? (
                     <div className="text-green-400 font-bold">Correct!</div>
                   ) : item.isDailyDouble && showDailyDoubleAnimation ? (
@@ -260,10 +260,12 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                       )}
                     </div>
                   ) : (
-                    item.answer
+                    <div className="px-8">
+                      {item.answer}
+                    </div>
                   )}
                 </div>
-                {(!showDailyDoubleAnimation) && (
+                {(!item.isDailyDouble || !showDailyDoubleAnimation) && (
                   <div className="w-full p-8">
                     <form onSubmit={handleSubmit} className="flex gap-2">
                       <input
@@ -276,7 +278,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                       <button
                         type="submit"
                         disabled={isSubmitting || showCorrect}
-                        className="px-6 py-2 bg-blue-800 rounded hover:bg-blue-900 transition-colors disabled:opacity-50"
+                        className="px-6 py-2 bg-green-800 rounded hover:bg-green-900 transition-colors disabled:opacity-50"
                       >
                         Submit
                       </button>

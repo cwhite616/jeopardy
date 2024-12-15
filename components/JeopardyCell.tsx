@@ -91,7 +91,9 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
         setIsIncorrect(true)
         setIncorrectAttempts(prev => prev + 1)
         inputRef.current.value = ''
-        inputRef.current.focus()
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 100)
       }
     } catch (error) {
       console.error('Error validating answer:', error)
@@ -117,7 +119,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
 
       {/* Regular cell */}
       <motion.div
-        className={`h-[calc((100vh-6rem)/6)] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded cursor-pointer perspective-500 ${
+        className={`h-[calc((100vh-6rem)/6)] bg-blue-700 text-white text-2xl md:text-3xl rounded cursor-pointer perspective-500 ${
           isActive ? 'ring-2 ring-yellow-300' : ''
         } ${!item.revealed && !isActive ? 'hover:scale-102' : ''}`}
         whileHover={!item.revealed && !isActive ? { scale: 1.02 } : {}}
@@ -137,11 +139,11 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
           >
             {/* Front face */}
             <div 
-              className={`absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden ${
+              className={`absolute w-full h-full flex items-center justify-center bg-blue-700 backface-hidden text-white ${
                 item.wasRevealed ? 'italic' : ''
               } ${isTestMode && item.isDailyDouble ? 'ring-2 ring-cyan-400' : ''}`}
             >
-              <span className="text-4xl md:text-6xl lg:text-7xl scale-[1]">
+              <span className="text-4xl md:text-6xl lg:text-7xl">
                 ${item.value}
               </span>
             </div>
@@ -151,11 +153,11 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                 item.showQuestion ? 'bg-blue-600/70' : 'bg-blue-700'
               }`}
             >
-              <div className="text-center text-lg p-2">
+              <div className="text-center text-3xl md:text-4xl lg:text-5xl p-4">
                 {item.revealed && (
                   <>
                     {item.showDailyDouble ? (
-                      <span className="text-3xl font-bold">DAILY DOUBLE!</span>
+                      <span className="text-white font-bold">DAILY DOUBLE!</span>
                     ) : (
                       <>
                         {item.showQuestion && (!activeCell || isActive) && (
@@ -167,7 +169,9 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                             <RotateCw className="w-5 h-5" />
                           </button>
                         )}
-                        {item.showQuestion ? item.question : item.answer}
+                        <span className={`text-white ${item.showQuestion ? 'text-gray-300' : ''}`}>
+                          {item.showQuestion ? item.question : item.answer}
+                        </span>
                       </>
                     )}
                   </>
@@ -188,7 +192,7 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="w-[80vw] h-[60vh] bg-blue-700 text-yellow-300 text-2xl md:text-3xl font-serif rounded relative"
+              className="w-[80vw] h-[60vh] bg-blue-700 text-white text-2xl md:text-3xl rounded relative"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}

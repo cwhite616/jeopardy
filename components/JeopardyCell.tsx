@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { RotateCw } from 'lucide-react'
+import { RotateCw, X } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 
@@ -194,13 +194,24 @@ export default function JeopardyCell({ item, onClick, onReset, isActive, activeC
                   DAILY DOUBLE!
                 </div>
               )}
-              <button
-                onClick={handleResetClick}
-                aria-label="Reset value"
-                className="absolute top-4 right-4 p-1 hover:bg-blue-800 rounded-full transition-colors z-10"
-              >
-                <RotateCw className="w-5 h-5" />
-              </button>
+              <div className="absolute top-4 right-4 flex gap-2">
+                <button
+                  onClick={onClick}
+                  aria-label="Reveal Question"
+                  title="Reveal Question"
+                  className="p-1 hover:bg-blue-800 rounded-full transition-colors z-10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleResetClick}
+                  aria-label="Reset Question to Points"
+                  title="Reset Question to Points"
+                  className="p-1 hover:bg-blue-800 rounded-full transition-colors z-10"
+                >
+                  <RotateCw className="w-5 h-5" />
+                </button>
+              </div>
               <div className="relative w-full h-full flex flex-col items-center justify-center">
                 <div className="text-center text-3xl md:text-4xl p-8 flex-grow flex items-center justify-center">
                   {showCorrect ? (

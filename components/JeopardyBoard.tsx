@@ -30,7 +30,11 @@ interface ActiveCell {
   questionIndex: number
 }
 
-export default function JeopardyBoard() {
+interface JeopardyBoardProps {
+  onFinalJeopardy: (difficulty: string) => void
+}
+
+export default function JeopardyBoard({ onFinalJeopardy }: JeopardyBoardProps) {
   const isTestMode = typeof window !== 'undefined' && 
     new URLSearchParams(window.location.search).get('test') === 'true'
 
@@ -154,7 +158,12 @@ export default function JeopardyBoard() {
         />
       )}
       <div className="relative z-[60]">
-        <HamburgerMenu onReset={resetBoard} onImportCSV={importCSV} />
+        <HamburgerMenu 
+          onReset={resetBoard} 
+          onImportCSV={importCSV}
+          onShowFinalJeopardy={onFinalJeopardy}
+          onShowBoard={() => {}}
+        />
       </div>
       <div className="grid grid-cols-5 gap-1 md:gap-2 h-[calc(100vh-2rem)] relative z-40">
         {board.map((category, categoryIndex) => (

@@ -7,9 +7,11 @@ import { createMenuItems } from './menu-config'
 interface HamburgerMenuProps {
   onReset: () => void
   onImportCSV: (file: File) => void
+  onShowFinalJeopardy: (difficulty: string) => void
+  onShowBoard: () => void
 }
 
-export default function HamburgerMenu({ onReset, onImportCSV }: HamburgerMenuProps) {
+export default function HamburgerMenu({ onReset, onImportCSV, onShowFinalJeopardy, onShowBoard }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -27,6 +29,8 @@ export default function HamburgerMenu({ onReset, onImportCSV }: HamburgerMenuPro
   const menuItems = createMenuItems({
     onImportClick: handleImportClick,
     onReset,
+    onShowBoard,
+    onShowFinalJeopardy,
   })
 
   return (

@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  jeopardy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jeopardy
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+      - /app/node_modules
